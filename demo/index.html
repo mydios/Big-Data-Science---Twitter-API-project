@@ -14,6 +14,14 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
+          <h1><span class="badge badge-success">#Tweets / day</span></h1>
+        </div>
+        <div class="col d-flex justify-content-center text-center">
+          <h1><span class="badge badge-success">Occurences of keywords</span></h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col d-flex justify-content-center text-center">
           <div id="graph" class="svg-container"></div>
         </div>
         <div class="col d-flex justify-content-center text-center">
@@ -21,10 +29,24 @@
         </div>
       </div>
       <div class="row">
-        <div class="col">
-          <div id="graph-tweets-line" class="svg-container"></div>
+        <div class="col d-flex justify-content-center text-center">
+          <h1><span class="badge badge-success">#Tweets / day</span></h1>
         </div>
-        <div class="col"></div>
+        <div class="col d-flex justify-content-center text-center">
+          <h1><span class="badge badge-success">#Covid cases / day</span></h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col d-flex justify-content-center text-center">
+          <div id="graph-tweets-line" class="svg-container">
+          </div>
+        </div>
+        <div class="col d-flex justify-content-center text-center">
+          <div id="prog" class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Loading data</div>
+          </div>
+          <div id="graph-covid-line" class="svg-container"></div>
+        </div>
       </div>
     </div>
   </body>
@@ -33,35 +55,36 @@
     d3.csv('tweets_per_day.csv').then(function(data){
       var svg = d3.select('#graph').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
       var svg2 = d3.select('#graph-tweets-line').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
-
       var bars = svg.selectAll('rect').data(data).enter();
       var numDays = data.length;
       var max = d3.max(data, function(d){ return +d['counts'] })
       var yScale = d3.scaleLinear().domain([max, 0]).range([0, 130]);
-      var xScale = d3.scaleLinear().domain([0, numDays]).range([20, 190]);
+      var xScale = d3.scaleTime().domain(d3.extent(data, function(d) {
+        return new Date(d['date'])
+      })).range([20, 190]);
       
-      var xAxis = d3.axisBottom().scale(xScale).ticks(25);
+      var xAxis = d3.axisBottom().scale(xScale).ticks(14);
       var yAxis = d3.axisLeft().scale(yScale).ticks(20);
-      svg.append('g').attr('class','axis').attr("transform", "translate(0,150)").call(xAxis)
+      svg.append('g').attr('class','axis').attr("transform", "translate(0,150)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
       svg.append('g').attr('class','axis').style("font", "5px times").attr("transform", "translate(18,20)").call(yAxis)
       
-      svg2.append('g').attr('class','axis').attr("transform", "translate(0,130)").call(xAxis)
+      svg2.append('g').attr('class','axis').attr("transform", "translate(0,130)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
       svg2.append('g').attr('class','axis').style("font", "5px times").attr("transform", "translate(18,0)").call(yAxis)
 
       svg2.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 1.5)
+      .attr("stroke", "rgb(94, 204, 123)")
+      .attr("stroke-width", 1)
       .attr("d", d3.line()
-        .x(function(d, i) { return xScale(i) })
+        .x(function(d, i) { return xScale(new Date(d['date'])) })
         .y(function(d) { return yScale(d['counts'])
        }).curve(d3.curveMonotoneX)
       )
 
       var rects = bars.append('rect')
         .attr('x', (data, i) => {
-        return xScale(i);
+        return xScale(new Date(data['date']));
       }).attr('y', (data, i) => {
         return yScale(data['counts'])+20
       }).attr('height', (data, i) => {
@@ -82,7 +105,6 @@
         svg.selectAll('#countLabel').remove()
       });
       
-      svg.append('text').attr('x', 100).attr('y', 20).text('#Tweets / day').style('text-anchor', 'middle').style("font", '10px sans-serif')
     })
 
     keywords = []
@@ -122,10 +144,44 @@
         .attr('y', yScale(data['count']) + 18)
         .style("font", '8px sans-serif')
       })
+    })
 
-      svg.append('text').attr('x', 100).attr('y', 20).text('Occurences of keywords').style('text-anchor', 'middle').style("font", '10px sans-serif')
+    covid = {}
+    d3.csv('COVID19BE_CASES_AGESEX.csv', function(d) {
+      if (d['DATE'] in covid)
+        covid[d['DATE']] = { date: d['DATE'], count: covid[d['DATE']]['count'] + parseInt(d['CASES'], 0) }
+      else
+        covid[d['DATE']] = { date: d['DATE'], count: parseInt(d['CASES'], 0) }
+    }).then(data => {
+      delete covid['NA']
+      covid_data = Object.values(covid)
+      d3.select('#prog').style('display', 'none')
 
-
+      var svg = d3.select('#graph-covid-line').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
+      var numDays = covid_data.length;
+      var max = d3.max(covid_data, function(d){ return +d['count'] })
+      var yScale = d3.scaleLinear().domain([max, 0]).range([0, 130]);
+      var xScale = d3.scaleTime().domain(d3.extent(covid_data, function(d) {
+        return new Date(d['date'])
+      })).range([20, 190]);
+      
+      var xAxis = d3.axisBottom().scale(xScale).ticks(14);
+      var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+      
+      svg.append('g').attr('class','axis').attr("transform", "translate(0,130)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
+      svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(19,0)").call(yAxis)
+      console.log(covid_data)
+      svg.append("path")
+      .datum(covid_data)
+      .attr("fill", "none")
+      .attr("stroke", "rgb(94, 204, 123)")
+      .attr("stroke-width", 1)
+      .attr("d", d3.line()
+        .x(function(d, i) { return xScale(new Date(d['date'])) })
+        .y(function(d) { return yScale(d['count'])
+       }).curve(d3.curveMonotoneX)
+      )
+      
     })
 
 

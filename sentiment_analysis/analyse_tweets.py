@@ -51,13 +51,16 @@ for key in tweets_per_day.keys():
         except:
             bad_tweets.append(tweet)
         if (current_batch > BATCH_SIZE):
-            time.sleep(0.1)
+            time.sleep(45)
             current_batch = 0  
+    if (len(sentiments) == 0):
+        print("\n\n API is blocking requests, exiting program...")
     sentiments_per_day[key] = (sum(sentiments)/len(sentiments))
     #write results of each day to protect intermediate results
-    with open('sentiments_per_day.csv', 'w') as f:
+    with open('sentiments_per_day.csv', 'a', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow('%s:%s'%(key, str(sentiments_per_day[key])))
+        writer.writerow([key, sentiments_per_day[key]])
+    
 
 
 print(sentiments_per_day)

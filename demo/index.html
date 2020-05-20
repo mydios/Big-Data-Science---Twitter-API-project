@@ -17,7 +17,10 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
-          <h1><span class="badge badge-success">#Tweets / day</span></h1>
+          <div class="col">
+            <h1><span class="badge badge-success">#Tweets / day</span></h1>
+            <h3 id="tweet-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+          </div>
         </div>
         <div class="col d-flex justify-content-center text-center">
           <h1><span class="badge badge-success">Occurences of keywords</span></h1>
@@ -36,7 +39,10 @@
           <h1><span class="badge badge-success">#Tweets / day</span></h1>
         </div>
         <div class="col d-flex justify-content-center text-center">
-          <h1><span class="badge badge-success">#Covid cases / day</span></h1>
+          <div class="col">
+            <h1><span class="badge badge-success">#Covid cases / day</span></h1>
+            <h3 id="covid-cases-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+          </div>
         </div>
       </div>
       <br>
@@ -51,7 +57,10 @@
       </div>
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
-          <h1><span class="badge badge-success">#Deaths / day</span></h1>
+          <div class="col">
+            <h1><span class="badge badge-success">#Deaths / day</span></h1>
+            <h3 id="covid-deaths-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+          </div>
         </div>
         <div class="col d-flex justify-content-center text-center">
           <h1><span class="badge badge-success">Tweet location distribution</span></h1>
@@ -119,12 +128,15 @@
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(53, 150, 78)')
         var date = new Date(d['date']).toDateString().split(' ')
-        svg.append('text').attr('x', 120).attr('y', 30).text(date[0]+' '+date[2]+' '+date[1]+": "+d['counts']+ " new cases").attr('id', 'countLabel').style("font", '6px sans-serif')
+        var text = d3.select("#tweet-text")
+        text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['counts']+ " new cases").style("visibility", "visible")
     	});
       rects.on("mouseout", function(d){
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(94, 204, 123)');
         svg.selectAll('#countLabel').remove()
+        var text = d3.select("#tweet-text")
+        text.style("visibility", "hidden")
       });
       
     })
@@ -208,12 +220,15 @@
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(53, 150, 78)')
         var date = new Date(d['date']).toDateString().split(' ')
-        svg.append('text').attr('x', 30).attr('y', 20).text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new cases").attr('id', 'countLabel').style("font", '6px sans-serif')
+        var text = d3.select("#covid-cases-text")
+        text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new cases").style("visibility", "visible")
     	});
       rects.on("mouseout", function(d){
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(94, 204, 123)');
         svg.selectAll('#countLabel').remove()
+        var text = d3.select("#covid-cases-text")
+        text.style("visibility", "hidden")
       });
 
     })
@@ -258,12 +273,15 @@
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(53, 150, 78)')
         var date = new Date(d['date']).toDateString().split(' ')
-        svg.append('text').attr('x', 30).attr('y', 20).text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new cases").attr('id', 'countLabel').style("font", '6px sans-serif')
+        var text = d3.select("#covid-deaths-text")
+        text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new deaths").style("visibility", "visible")
     	});
       rects.on("mouseout", function(d){
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(94, 204, 123)');
         svg.selectAll('#countLabel').remove()
+        var text = d3.select("#covid-deaths-text")
+        text.style("visibility", "hidden")
       });
 
     })

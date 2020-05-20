@@ -19,7 +19,7 @@ class SentimentAnalyser(object):
         """Analyse a document of any language and return the deduced polarity scores and a compound sentiment value. 
 
         Args:
-            document (String|list of String): The original document that is to be scored 
+            document (String): The original document that is to be scored 
 
         Returns:
             dict: A dictionary indicating the positive, negative, neutral and compound scores using the 
@@ -34,7 +34,7 @@ class SentimentAnalyser(object):
         """Analyse a document of any language and return the sentiment value that was deduced
 
         Args:
-            document (String|list of String): The original document that is to be scored
+            document (String): The original document that is to be scored
 
         Returns:
             float: A sentiment indication value in the range [-1, 1]. The partial range

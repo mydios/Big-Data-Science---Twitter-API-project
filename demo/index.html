@@ -16,63 +16,66 @@
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
           <div class="col">
-            <h1><span class="badge badge-success">#Tweets / day</span></h1>
-            <h3 id="tweet-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+            <div class="col">
+              <h1><span class="badge badge-success">#Tweets / day</span></h1>
+              <h3 id="tweet-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+            </div>
+            <div id="graph" class="svg-container"></div>
           </div>
-        </div>
-        <div class="col d-flex justify-content-center text-center">
-          <h1><span class="badge badge-success">Occurences of keywords</span></h1>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col d-flex justify-content-center text-center">
-          <div id="graph" class="svg-container"></div>
-        </div>
-        <div class="col d-flex justify-content-center text-center">
-          <div id="graph_keywords" class="svg-container"></div>
-        </div>
-      </div>
-       <div class="row">
-        <div class="col d-flex justify-content-center text-center">
-          <h1><span class="badge badge-success">#Tweets / day</span></h1>
         </div>
         <div class="col d-flex justify-content-center text-center">
           <div class="col">
-            <h1><span class="badge badge-success">#Covid cases / day</span></h1>
-            <h3 id="covid-cases-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
-          </div>
+            <h1><span class="badge badge-success">Occurences of keywords</span></h1>
+            <br>
+            <div id="graph_keywords" class="svg-container"></div>
+          </div>  
         </div>
       </div>
       <br>
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
-          <div id="graph-tweets-line" class="svg-container">
-          </div>
+          <div class="col">
+            <div class="col">
+              <h1><span class="badge badge-success">#Covid cases / day</span></h1>
+              <h3 id="covid-cases-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+            </div>
+            <div id="graph-covid-cases" class="svg-container">
+            </div>
+        </div>
         </div>
         <div class="col d-flex justify-content-center text-center">
-          <div id="graph-covid-line" class="svg-container"></div>
+          <div class="col">
+            <div class="col">
+              <h1><span class="badge badge-success">#Covid deaths / day</span></h1>
+              <h3 id="covid-deaths-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+            </div>
+            <div id="graph-covid-death" class="svg-container"></div>
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
-          <div class="col">
-            <h1><span class="badge badge-success">#Deaths / day</span></h1>
-            <h3 id="covid-deaths-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
-          </div>
         </div>
         <div class="col d-flex justify-content-center text-center">
-          <h1><span class="badge badge-success">Tweet location distribution</span></h1>
         </div>
       </div>
       <br>
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
-          <div id="graph-covid-death" class="svg-container">
+          <div class="col">
+            <div class="col">
+              <h1><span class="badge badge-success">#Tweets / day</span></h1>
+              <h3 id="covid-deaths-text" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+            </div>
+            <div id="graph-tweets-line" class="svg-container"></div>
           </div>
         </div>
         <div class="col d-flex justify-content-center text-center">
-          <div id="map" style="height: 60%; width: 80%;">
-          </div>
+          <div class="col">
+            <h1><span class="badge badge-success">Tweet location distribution</span></h1>
+            <br>
+            <div id="map" style="height: 60%;  margin-top: 20px;"></div>
+          </div>  
         </div>
       </div>
     </div>
@@ -82,16 +85,17 @@
   <script type="text/javascript" src="scripts/graphs.js"></script>
   <script>
     
-    createTweetCountGraph(d3.select('#graph'), d3.select('#graph-tweets-line'))
+    createTweetCountGraph('#graph', '#graph-tweets-line')
 
-    createKeywordGraph(d3.select('#graph_keywords'))
+    createKeywordGraph('#graph_keywords')
 
-    createInfectionsGraph(d3.select('#graph-covid-line'))
+    createInfectionsGraph('#graph-covid-cases')
 
-    createDeathsGraph(d3.select('#graph-covid-death'))
+    createDeathsGraph('#graph-covid-death')
 
     createLocationMap('map')
     
+
   </script>
   <style>
     .svg-container {
@@ -101,6 +105,7 @@
     padding-bottom: 100%;
     vertical-align: top;
     overflow: hidden;
+    margin-top: 30px;
   }
   .svg-content {
     display: inline-block;

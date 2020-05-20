@@ -1,4 +1,3 @@
-import googletrans
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 class SentimentAnalyser(object):
@@ -12,7 +11,6 @@ class SentimentAnalyser(object):
         Takes no arguments
     """
     def __init__(self):
-        self.translator = googletrans.Translator()
         self.analyser = SentimentIntensityAnalyzer()
     
     def get_polarity(self, document):
@@ -42,9 +40,8 @@ class SentimentAnalyser(object):
         """
         return self.get_polarity(document)['compound']
     
-    def __analyse(self, document):
-        translated_document = self.translator.translate(document, dest = 'en')
-        return self.analyser.polarity_scores(translated_document.text)
+    def __analyse(self, text):
+        return self.analyser.polarity_scores(text)
 
 
 

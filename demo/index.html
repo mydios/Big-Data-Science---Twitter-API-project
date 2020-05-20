@@ -3,6 +3,9 @@
   <head>
     <title>Big Data Science</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
   </head>
   <body>
     <nav class="navbar navbar-dark" style="background-color: #08872a;">
@@ -10,7 +13,7 @@
         Project
       </a>
     </nav>
-
+    <br>
     <div class="container-fluid">
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
@@ -28,7 +31,7 @@
           <div id="graph_keywords" class="svg-container"></div>
         </div>
       </div>
-      <div class="row">
+       <div class="row">
         <div class="col d-flex justify-content-center text-center">
           <h1><span class="badge badge-success">#Tweets / day</span></h1>
         </div>
@@ -36,23 +39,43 @@
           <h1><span class="badge badge-success">#Covid cases / day</span></h1>
         </div>
       </div>
+      <br>
       <div class="row">
         <div class="col d-flex justify-content-center text-center">
           <div id="graph-tweets-line" class="svg-container">
           </div>
         </div>
         <div class="col d-flex justify-content-center text-center">
-          <div id="prog" class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Loading data</div>
-          </div>
           <div id="graph-covid-line" class="svg-container"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col d-flex justify-content-center text-center">
+          <h1><span class="badge badge-success">#Deaths / day</span></h1>
+        </div>
+        <div class="col d-flex justify-content-center text-center">
+          <h1><span class="badge badge-success">Tweet location distribution</span></h1>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col d-flex justify-content-center text-center">
+          <div id="graph-covid-death" class="svg-container">
+          </div>
+        </div>
+        <div class="col d-flex justify-content-center text-center">
+          <div id="map" style="height: 60%; width: 80%;">
+          </div>
         </div>
       </div>
     </div>
   </body>
   <script type="text/javascript" src="d3/d3.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+  integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+  crossorigin=""></script>
   <script>
-    d3.csv('tweets_per_day.csv').then(function(data){
+    d3.csv('data/tweets_per_day.csv').then(function(data){
       var svg = d3.select('#graph').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
       var svg2 = d3.select('#graph-tweets-line').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
       var bars = svg.selectAll('rect').data(data).enter();
@@ -68,8 +91,8 @@
       svg.append('g').attr('class','axis').attr("transform", "translate(0,150)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
       svg.append('g').attr('class','axis').style("font", "5px times").attr("transform", "translate(18,20)").call(yAxis)
       
-      svg2.append('g').attr('class','axis').attr("transform", "translate(0,130)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
-      svg2.append('g').attr('class','axis').style("font", "5px times").attr("transform", "translate(18,0)").call(yAxis)
+      svg2.append('g').attr('class','axis').attr("transform", "translate(0,150)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
+      svg2.append('g').attr('class','axis').style("font", "5px times").attr("transform", "translate(18,20)").call(yAxis)
 
       svg2.append("path")
       .datum(data)
@@ -78,7 +101,7 @@
       .attr("stroke-width", 1)
       .attr("d", d3.line()
         .x(function(d, i) { return xScale(new Date(d['date'])) })
-        .y(function(d) { return yScale(d['counts'])
+        .y(function(d) { return yScale(d['counts']) + 20
        }).curve(d3.curveMonotoneX)
       )
 
@@ -95,9 +118,8 @@
       rects.on("mouseover", function(d){
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(53, 150, 78)')
-        var x = currentBar.attr('x')
-        var y = currentBar.attr('y')
-        svg.append('text').attr('x', x).attr('y', y-10).text(d['counts']).attr('id', 'countLabel').style("font", '8px sans-serif')
+        var date = new Date(d['date']).toDateString().split(' ')
+        svg.append('text').attr('x', 120).attr('y', 30).text(date[0]+' '+date[2]+' '+date[1]+": "+d['counts']+ " new cases").attr('id', 'countLabel').style("font", '6px sans-serif')
     	});
       rects.on("mouseout", function(d){
         var currentBar = d3.select(this);
@@ -108,7 +130,7 @@
     })
 
     keywords = []
-    d3.csv('keyword_count.csv').then(function(data){
+    d3.csv('data/keyword_count.csv').then(function(data){
         data.sort(function(x, y) {
         return y['count'] - x['count']
       })
@@ -123,7 +145,7 @@
       var xScale = d3.scaleBand().domain(keywords).range([20, 190]);
       var yAxis = d3.axisLeft().scale(yScale).ticks(10);
       var xAxis = d3.axisBottom().scale(xScale)
-      svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(-1,150)").call(xAxis)
+      svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(-1,150)").call(xAxis).selectAll('text').attr('y',5).attr('x', 10).attr("transform", "rotate(45)").style("font", '4px sans-serif')
 
       svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(19,20)").call(yAxis)
     
@@ -147,7 +169,7 @@
     })
 
     covid = {}
-    d3.csv('COVID19BE_CASES_AGESEX.csv', function(d) {
+    d3.csv('data/COVID19BE_CASES_AGESEX.csv', function(d) {
       if (d['DATE'] in covid)
         covid[d['DATE']] = { date: d['DATE'], count: covid[d['DATE']]['count'] + parseInt(d['CASES'], 0) }
       else
@@ -155,9 +177,9 @@
     }).then(data => {
       delete covid['NA']
       covid_data = Object.values(covid)
-      d3.select('#prog').style('display', 'none')
 
       var svg = d3.select('#graph-covid-line').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
+      var bars = svg.selectAll('rect').data(covid_data).enter();
       var numDays = covid_data.length;
       var max = d3.max(covid_data, function(d){ return +d['count'] })
       var yScale = d3.scaleLinear().domain([max, 0]).range([0, 130]);
@@ -168,23 +190,99 @@
       var xAxis = d3.axisBottom().scale(xScale).ticks(14);
       var yAxis = d3.axisLeft().scale(yScale).ticks(10);
       
-      svg.append('g').attr('class','axis').attr("transform", "translate(0,130)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
-      svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(19,0)").call(yAxis)
-      console.log(covid_data)
-      svg.append("path")
-      .datum(covid_data)
-      .attr("fill", "none")
-      .attr("stroke", "rgb(94, 204, 123)")
-      .attr("stroke-width", 1)
-      .attr("d", d3.line()
-        .x(function(d, i) { return xScale(new Date(d['date'])) })
-        .y(function(d) { return yScale(d['count'])
-       }).curve(d3.curveMonotoneX)
-      )
-      
+      svg.append('g').attr('class','axis').attr("transform", "translate(0,150)").call(xAxis).selectAll('text').attr('y',0).attr('x', 15).attr("transform", "rotate(90)")
+      svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(19,20)").call(yAxis)
+
+      var rects = bars.append('rect')
+        .attr('x', (data, i) => {
+        return xScale(new Date(data['date'])); 
+      }).attr('y', (data, i) => {
+        return yScale(data['count']) + 20
+      }).attr('height', (data, i) => {
+        return 130 - yScale(data['count'])
+      }).attr('width', (180 / covid_data.length) - 0.5)
+      .style('fill','rgb(94, 204, 123)')
+
+
+      rects.on("mouseover", function(d){
+        var currentBar = d3.select(this);
+        currentBar.style('fill','rgb(53, 150, 78)')
+        var date = new Date(d['date']).toDateString().split(' ')
+        svg.append('text').attr('x', 30).attr('y', 20).text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new cases").attr('id', 'countLabel').style("font", '6px sans-serif')
+    	});
+      rects.on("mouseout", function(d){
+        var currentBar = d3.select(this);
+        currentBar.style('fill','rgb(94, 204, 123)');
+        svg.selectAll('#countLabel').remove()
+      });
+
     })
 
+    covid_deaths   = {}
+    d3.csv('data/COVID19BE_MORT.csv', function(d) {
+      if (d['DATE'] in covid_deaths)
+        covid_deaths[d['DATE']] = { date: d['DATE'], count: covid_deaths[d['DATE']]['count'] + parseInt(d['DEATHS'], 0) }
+      else
+        covid_deaths[d['DATE']] = { date: d['DATE'], count: parseInt(d['DEATHS'], 0) }
+    }).then(data => {
+      delete covid_deaths['NA']
+      covid_deaths_filtered = Object.values(covid_deaths)
 
+      var svg = d3.select('#graph-covid-death').append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
+      var bars = svg.selectAll('rect').data(covid_deaths_filtered).enter();
+      var numDays = covid_deaths_filtered.length;
+      var max = d3.max(covid_deaths_filtered, function(d){ return +d['count'] })
+      var yScale = d3.scaleLinear().domain([max, 0]).range([0, 130]);
+      var xScale = d3.scaleTime().domain(d3.extent(covid_deaths_filtered, function(d) {
+        return new Date(d['date'])
+      })).range([200/numDays/2 + 18, 200 - 200/numDays/2]);
+      
+      var xAxis = d3.axisBottom().scale(xScale).ticks(17).tickSize(4);
+      var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+      
+      svg.append('g').attr('class','axis').attr("transform", "translate(0,130)").call(xAxis).selectAll('text').attr("transform", "rotate(90)").attr('y',-2).attr('x', 16)
+      svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(18,0)").call(yAxis)
+
+      var rects = bars.append('rect')
+        .attr('x', (data, i) => {
+        return xScale(new Date(data['date'])); 
+      }).attr('y', (data, i) => {
+        return yScale(data['count'])
+      }).attr('height', (data, i) => {
+        return 130 - yScale(data['count'])
+      }).attr('width', (190 / numDays) - 0.5)
+      .style('fill','rgb(94, 204, 123)')
+
+
+      rects.on("mouseover", function(d){
+        var currentBar = d3.select(this);
+        currentBar.style('fill','rgb(53, 150, 78)')
+        var date = new Date(d['date']).toDateString().split(' ')
+        svg.append('text').attr('x', 30).attr('y', 20).text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new cases").attr('id', 'countLabel').style("font", '6px sans-serif')
+    	});
+      rects.on("mouseout", function(d){
+        var currentBar = d3.select(this);
+        currentBar.style('fill','rgb(94, 204, 123)');
+        svg.selectAll('#countLabel').remove()
+      });
+
+    })
+
+    var map = L.map('map').setView([50.8549541, 4.3053504], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    setTimeout(function(){ map.invalidateSize()
+      d3.csv('data/tweet_locations.csv', function(d) {
+        L.circle([d['location_lat'], d['location_lon']], {
+          color: '#3399ff',
+          radius: 10
+        }).addTo(map);
+      })
+    }, 400);
+    
+
+    
 
 
 

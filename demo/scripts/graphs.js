@@ -10,7 +10,6 @@ var paddingLeft = 20
 /**
  * 
  * @param {string} containerBarsId 
- * @param {string} containerLinesId 
  */
 function createTweetCountGraph(containerBarsId) {
   d3.csv('../data/tweets_per_day.csv').then(function(data){
@@ -348,10 +347,16 @@ function createDeathSentGraph(containerId) {
       text.style("visibility", "hidden")
     });
 
-    d3.csv('data/sentiment_deviation.csv').then(sentiments => {
-      var max = d3.max(sentiments, function(d){ return +d['signed_squared_deviation'] })
-      var min = d3.min(sentiments, function(d) { return +d['signed_squared_deviation']})
-      var yscale2 = d3.scaleLinear().domain([max, min]).range([0, 130]);
+    var rolling_average_14 = []
+    var rolling_average_7 = []
+    d3.csv('data/filtered_rolling_average_negative_fraction.csv', function(d) {
+      if (d['rolling_average_14'] != 0) {
+        rolling_average_14.push({'date': d['date'], 'rolling_average_14': d['rolling_average_14']})
+      }
+    }).then(_ => {
+      var max = d3.max(rolling_average_14, function(d){ return +d['rolling_average_14'] })
+      var min = d3.min(rolling_average_14, function(d) { return +d['rolling_average_14']})
+      var yscale2 = d3.scaleLinear().domain([max, min]).range([1, 130]);
       var yAxisRight = d3.axisRight().scale(yscale2).ticks(5); 
       var svgAxisRight = svg.append("g")
       .attr('class','axis')	
@@ -360,22 +365,152 @@ function createDeathSentGraph(containerId) {
       .call(yAxisRight)
       svgAxisRight.selectAll('path').style('stroke', '#0980A0')
       svgAxisRight.selectAll('line').style('stroke', '#0980A0')
-
+      
       svg.append("path")
-      .datum(sentiments)
+      .datum(rolling_average_14)
       .attr("fill", "none")
       .attr("stroke", "#0980A0")
       .attr("stroke-width", 1) 
       .attr("d", d3.line()
         .x(function(d) { return xScale(new Date(d['date'])) })
-        .y(function(d) { return yscale2(d['signed_squared_deviation'])
+        .y(function(d) { return yscale2(d['rolling_average_14'])
        }).curve(d3.curveMonotoneX)
       )
     })
-    svg.append("circle").attr("cx",30).attr("cy",10).attr("r", 2).style("fill", "#5ECC7B")
-    svg.append("circle").attr("cx",30).attr("cy",20).attr("r", 2).style("fill", "#0980A0")
-    svg.append("text").attr("x", 35).attr("y", 10).text("Covid-19 deaths").style("font-size", "5px").attr("alignment-baseline","middle")
-    svg.append("text").attr("x", 35).attr("y", 20).text("Sentiment deviation").style("font-size", "5px").attr("alignment-baseline","middle")
+
+    d3.csv('data/filtered_rolling_average_negative_fraction.csv', function(d) {
+      if (d['rolling_average_7'] != 0) {
+        rolling_average_7.push({'date': d['date'], 'rolling_average_7': d['rolling_average_7']})
+      }
+    }).then(_ => {
+      var max = d3.max(rolling_average_7, function(d){ return +d['rolling_average_7'] })
+      var min = d3.min(rolling_average_7, function(d) { return +d['rolling_average_7']})
+      var yscale2 = d3.scaleLinear().domain([max, min]).range([1, 130]);
+      var yAxisRight = d3.axisRight().scale(yscale2).ticks(5); 
+      var svgAxisRight = svg.append("g")
+      .attr('class','axis')	
+      .style("font", "3px times")
+      .attr("transform", "translate(" + 183 + " ,0)")	
+      .call(yAxisRight)
+      svgAxisRight.selectAll('path').style('stroke', '#0980A0')
+      svgAxisRight.selectAll('line').style('stroke', '#0980A0')
+      
+      svg.append("path")
+      .datum(rolling_average_7)
+      .attr("fill", "none")
+      .attr("stroke", "#C47208")
+      .attr("stroke-width", 1) 
+      .attr("d", d3.line()
+        .x(function(d) { return xScale(new Date(d['date'])) })
+        .y(function(d) { return yscale2(d['rolling_average_7'])
+       }).curve(d3.curveMonotoneX)
+      )
+    })
+    svg.append("circle").attr("cx",30).attr("cy",165).attr("r", 2).style("fill", "#5ECC7B")
+    svg.append("circle").attr("cx",30).attr("cy",170).attr("r", 2).style("fill", "#0980A0")
+    svg.append("circle").attr("cx",30).attr("cy",175).attr("r", 2).style("fill", "#C47208")
+
+    svg.append("text").attr("x", 35).attr("y", 165).text("Covid-19 deaths").style("font-size", "5px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 35).attr("y", 170).text("Rolling average of negative sentiment fraction (14-day window)").style("font-size", "5px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 35).attr("y", 175).text("Rolling average of negative sentiment fraction (7-day window)").style("font-size", "5px").attr("alignment-baseline","middle")
+
+  })
+}
+
+
+function createDeathSentGraph2(containerId) {
+  covid_deaths   = {}
+  var newWidth = graphWidth - 6
+  var svg = d3.select(containerId).append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
+  d3.csv('data/COVID19BE_MORT.csv', function(d) {
+    if (d['DATE'] in covid_deaths)
+      covid_deaths[d['DATE']] = { date: d['DATE'], count: covid_deaths[d['DATE']]['count'] + parseInt(d['DEATHS'], 0) }
+    else
+      covid_deaths[d['DATE']] = { date: d['DATE'], count: parseInt(d['DEATHS'], 0) }
+  }).then(_ => {
+    delete covid_deaths['NA']
+    covid_deaths_filtered = Object.values(covid_deaths)
+
+    var barSpacing = 0.5
+    var bars = svg.selectAll('rect').data(covid_deaths_filtered).enter();
+    var numDays = covid_deaths_filtered.length;
+    var max = d3.max(covid_deaths_filtered, function(d){ return +d['count'] })
+    var yScale = d3.scaleLinear().domain([max, 0]).range([0, 130]);
+    var domain = d3.extent(covid_deaths_filtered, function(d) {
+      return new Date(d['date'])
+    })
+    domain[0] = domain[0].setDate(domain[0].getDate() - 1)
+    domain[1] = domain[1].setDate(domain[1].getDate() + 1)
+    var xScale = d3.scaleTime().domain(domain).range([paddingLeft + (newWidth/numDays - barSpacing)/2, newWidth+paddingLeft - (newWidth/numDays - barSpacing)/2]);
+
+    var xAxis = d3.axisBottom().scale(xScale).ticks(17).tickSize(4);
+    var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+    
+    svg.append('g').attr('class','axis').attr("transform", "translate(-"+barSpacing/2+","+graphHeight+")").call(xAxis).selectAll('text').attr("transform", "rotate(90)").attr('y',-2).attr('x', 16)
+    svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate("+paddingLeft+",0)").call(yAxis)
+
+    var rects = bars.append('rect')
+      .attr('x', (data, _) => {
+        return xScale(new Date(data['date'])) - (newWidth/numDays - barSpacing)/2; 
+      }).attr('y', (data, _) => {
+        return yScale(data['count'])
+      }).attr('height', (data, _) => {
+        return 130 - yScale(data['count'])
+      }).attr('width', (newWidth / numDays) - barSpacing)
+      .style('fill','rgb(94, 204, 123)')
+
+
+    rects.on("mouseover", function(d){
+      var currentBar = d3.select(this);
+      currentBar.style('fill','rgb(53, 150, 78)')
+      var date = new Date(d['date']).toDateString().split(' ')
+      var text = d3.select("#covid-deaths-text-2")
+      text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new deaths").style("visibility", "visible")
+    });
+    rects.on("mouseout", function(_){
+      var currentBar = d3.select(this);
+      currentBar.style('fill','rgb(94, 204, 123)');
+      svg.selectAll('#countLabel').remove()
+      var text = d3.select("#covid-deaths-text-2")
+      text.style("visibility", "hidden")
+    });
+
+    var squared_deviation = []
+    d3.csv('data/filtered_rolling_average_squared_deviation.csv', function(d) {
+      if (d['signed_squared_deviation'] != 0) {
+        squared_deviation.push({'date': d['date'], 'squared_deviation': d['signed_squared_deviation']})
+      }
+    }).then(_ => {
+      var max = d3.max(squared_deviation, function(d){ return +d['squared_deviation'] })
+      var min = d3.min(squared_deviation, function(d) { return +d['squared_deviation']})
+      var yscale2 = d3.scaleLinear().domain([max, min]).range([1, 130]);
+      var yAxisRight = d3.axisRight().scale(yscale2).ticks(5); 
+      var svgAxisRight = svg.append("g")
+      .attr('class','axis')	
+      .style("font", "3px times")
+      .attr("transform", "translate(" + 183 + " ,0)")	
+      .call(yAxisRight)
+      svgAxisRight.selectAll('path').style('stroke', '#0980A0')
+      svgAxisRight.selectAll('line').style('stroke', '#0980A0')
+      
+      svg.append("path")
+      .datum(squared_deviation)
+      .attr("fill", "none")
+      .attr("stroke", "#0980A0")
+      .attr("stroke-width", 1) 
+      .attr("d", d3.line()
+        .x(function(d) { return xScale(new Date(d['date'])) })
+        .y(function(d) { return yscale2(d['squared_deviation'])
+       }).curve(d3.curveMonotoneX)
+      )
+    })
+
+    svg.append("circle").attr("cx",30).attr("cy",165).attr("r", 2).style("fill", "#5ECC7B")
+    svg.append("circle").attr("cx",30).attr("cy",170).attr("r", 2).style("fill", "#0980A0")
+
+    svg.append("text").attr("x", 35).attr("y", 165).text("Covid-19 deaths").style("font-size", "5px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 35).attr("y", 170).text("Rolling avergage of signed square deviation (14-day window)").style("font-size", "5px").attr("alignment-baseline","middle")
+  
   })
 }
 

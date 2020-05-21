@@ -59,10 +59,18 @@
           <div id="graph-covid-hosp" class="svg-container"></div>
         </div>
         <div class="col justify-content-center text-center">
-          <h2><span class="badge badge-success">Sentiment deviation vs deaths</span></h1>
+          <h2><span class="badge badge-success">Negative sentiment fraction vs deaths</span></h1>
           <h3 id="covid-deaths-text-2" style="font: 15px sans-serif; visibility: hidden;">T</h3>
-          <div id="graph-deaths-sent" class="svg-container"></div>
+          <div id="graph-deaths-fract" class="svg-container"></div>
         </div>
+      </div>
+      <div class="row">
+        <div class="col justify-content-center text-center">
+          <h2><span class="badge badge-success">Squared deviation vs deaths</span></h1>
+          <h3 id="covid-deaths-text-3" style="font: 15px sans-serif; visibility: hidden;">T</h3>
+          <div id="graph-deaths-dev" class="svg-container"></div>
+        </div>
+        <div class="col justify-content-center text-center"></div>
       </div>
     </div>
     </div>
@@ -84,7 +92,9 @@
 
     createLocationMap('map')
 
-    createDeathSentGraph('#graph-deaths-sent')
+    createDeathSentGraph('#graph-deaths-fract')
+
+    createDeathSentGraph2('#graph-deaths-dev')
 
     showMostPopular('#most-popular')
     

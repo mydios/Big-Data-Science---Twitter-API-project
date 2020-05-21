@@ -250,6 +250,65 @@ function createDeathsGraph(containerId) {
   })
 }
 
+function createHospitalGraph(containerId) {    
+  covid = {}
+  barSpacing = 0.5
+  d3.csv('data/COVID19BE_HOSP.csv', function(d) {
+    if (d['DATE'] in covid)
+      covid[d['DATE']] = { date: d['DATE'], count: covid[d['DATE']]['count'] + parseInt(d['NEW_IN'], 0) }
+    else
+      covid[d['DATE']] = { date: d['DATE'], count: parseInt(d['NEW_IN'], 0) }
+  }).then(_ => {
+    delete covid['NA']
+    covid_data = Object.values(covid)
+
+    var svg = d3.select(containerId).append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
+    var bars = svg.selectAll('rect').data(covid_data).enter();
+    var numDays = covid_data.length;
+    var max = d3.max(covid_data, function(d){ return +d['count'] })
+    var yScale = d3.scaleLinear().domain([max, 0]).range([0, graphHeight]);
+    var domain = d3.extent(covid_data, function(d) {
+      return new Date(d['date'])
+    })
+    domain[0] = domain[0].setDate(domain[0].getDate() - 1)
+    domain[1] = domain[1].setDate(domain[1].getDate() + 1)
+    var xScale = d3.scaleTime().domain(domain).range([paddingLeft + (graphWidth/numDays - barSpacing)/2, graphWidth+paddingLeft - (graphWidth/numDays - barSpacing)/2]);
+    
+    var xAxis = d3.axisBottom().scale(xScale).ticks(5).tickSizeOuter(0);
+    var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+    
+    svg.append('g').attr('class','axis').attr("transform", "translate(-"+barSpacing/2+","+graphHeight+")").call(xAxis).selectAll('text').attr('y',-2).attr('x', 15).attr("transform", "rotate(90)")
+    svg.append('g').attr('class','axis').style("font", "4px times").attr("transform", "translate(20.5,0)").call(yAxis)
+
+    var rects = bars.append('rect')
+      .attr('x', (data, _) => {
+      return xScale(new Date(data['date'])) - (graphWidth/numDays - barSpacing)/2; 
+    }).attr('y', (data, _) => {
+      return yScale(data['count'])
+    }).attr('height', (data, _) => {
+      return 130 - yScale(data['count'])
+    }).attr('width', (graphWidth / numDays) - barSpacing)
+    .style('fill','rgb(94, 204, 123)')
+
+
+    rects.on("mouseover", function(d){
+      var currentBar = d3.select(this);
+      currentBar.style('fill','rgb(53, 150, 78)')
+      var date = new Date(d['date']).toDateString().split(' ')
+      var text = d3.select("#covid-hosp-text")
+      text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new hospitalizations").style("visibility", "visible")
+    });
+    rects.on("mouseout", function(d){
+      var currentBar = d3.select(this);
+      currentBar.style('fill','rgb(94, 204, 123)');
+      svg.selectAll('#countLabel').remove()
+      var text = d3.select("#covid-hosp-text")
+      text.style("visibility", "hidden")
+    });
+
+  })
+}
+
 /**
  * Loads the tweet location data and displays it on a leaflet map
  * @param {string} mapName The id of the map div element

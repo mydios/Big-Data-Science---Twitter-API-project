@@ -471,7 +471,7 @@ function createDeathSentGraph2(containerId) {
       var currentBar = d3.select(this);
       currentBar.style('fill','rgb(94, 204, 123)');
       svg.selectAll('#countLabel').remove()
-      var text = d3.select("#covid-deaths-text-2")
+      var text = d3.select("#covid-deaths-text-3")
       text.style("visibility", "hidden")
     });
 

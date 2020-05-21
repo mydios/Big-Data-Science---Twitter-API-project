@@ -337,14 +337,14 @@ function createDeathSentGraph(containerId) {
       var currentBar = d3.select(this);
       currentBar.style('fill','rgb(53, 150, 78)')
       var date = new Date(d['date']).toDateString().split(' ')
-      var text = d3.select("#covid-deaths-text")
+      var text = d3.select("#covid-deaths-text-2")
       text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new deaths").style("visibility", "visible")
     });
     rects.on("mouseout", function(_){
       var currentBar = d3.select(this);
       currentBar.style('fill','rgb(94, 204, 123)');
       svg.selectAll('#countLabel').remove()
-      var text = d3.select("#covid-deaths-text")
+      var text = d3.select("#covid-deaths-text-2")
       text.style("visibility", "hidden")
     });
 

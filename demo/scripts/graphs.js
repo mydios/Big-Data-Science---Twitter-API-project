@@ -372,7 +372,7 @@ function createDeathSentGraph(containerId) {
       var max = d3.max(rolling_average_14, function(d){ return +d['rolling_average_14'] })
       var min = d3.min(rolling_average_14, function(d) { return +d['rolling_average_14']})
       var yscale2 = d3.scaleLinear().domain([max, min]).range([1, 130]);
-      var yAxisRight = d3.axisRight().scale(yscale2).ticks(5); 
+      var yAxisRight = d3.axisRight().scale(yscale2).ticks(10); 
       var svgAxisRight = svg.append("g")
       .attr('class','axis')	
       .style("font", "3px times")
@@ -401,14 +401,6 @@ function createDeathSentGraph(containerId) {
       var max = d3.max(rolling_average_7, function(d){ return +d['rolling_average_7'] })
       var min = d3.min(rolling_average_7, function(d) { return +d['rolling_average_7']})
       var yscale2 = d3.scaleLinear().domain([max, min]).range([1, 130]);
-      var yAxisRight = d3.axisRight().scale(yscale2).ticks(5); 
-      var svgAxisRight = svg.append("g")
-      .attr('class','axis')	
-      .style("font", "3px times")
-      .attr("transform", "translate(" + 183 + " ,0)")	
-      .call(yAxisRight)
-      svgAxisRight.selectAll('path').style('stroke', '#0980A0')
-      svgAxisRight.selectAll('line').style('stroke', '#0980A0')
       
       svg.append("path")
       .datum(rolling_average_7)

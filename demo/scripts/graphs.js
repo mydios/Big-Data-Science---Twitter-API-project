@@ -8,8 +8,8 @@ var graphHeight = 130
 var paddingLeft = 20
 
 /**
- * 
- * @param {string} containerBarsId 
+ * Create a bar plot with the amount of collected tweets per day
+ * @param {string} containerBarsId Id of the div container which will contain this graph
  */
 function createTweetCountGraph(containerBarsId) {
   d3.csv('../data/tweets_per_day.csv').then(function(data){
@@ -50,7 +50,7 @@ function createTweetCountGraph(containerBarsId) {
       var text = d3.select("#tweet-text")
       text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['counts']+ " tweets").style("visibility", "visible")
     });
-    rects.on("mouseout", function(d){
+    rects.on("mouseout", function(_){
       var currentBar = d3.select(this);
       currentBar.style('fill','rgb(94, 204, 123)');
       svg.selectAll('#countLabel').remove()
@@ -61,7 +61,10 @@ function createTweetCountGraph(containerBarsId) {
   })
 }
 
-
+/**
+ * Create a bar plot with the amount of tweets in which the specific keyword occurs
+ * @param {string} containerId Id of the div container which will contain this graph
+ */
 function createKeywordGraph(containerId) {
     keywords = []
     d3.csv('../data/keyword_count.csv').then(function(data){
@@ -105,6 +108,11 @@ function createKeywordGraph(containerId) {
     })
 }
 
+/**
+ * Create a bar plot with the number of new Covid-19 infections per day
+ * Data by Sciensano
+ * @param {string} containerId Id of the div container which will contain this graph
+ */
 function createInfectionsGraph(containerId) {    
     covid = {}
     barSpacing = 0.5
@@ -153,7 +161,7 @@ function createInfectionsGraph(containerId) {
         var text = d3.select("#covid-cases-text")
         text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new cases").style("visibility", "visible")
     	});
-      rects.on("mouseout", function(d){
+      rects.on("mouseout", function(_){
         var currentBar = d3.select(this);
         currentBar.style('fill','rgb(94, 204, 123)');
         svg.selectAll('#countLabel').remove()
@@ -165,7 +173,8 @@ function createInfectionsGraph(containerId) {
 }
 
 /**
- * 
+ * Create a bar plot with the number of new Covid-19 deaths per day
+ * Data by Sciensano
  * @param {string} containerId Id of the div container which will contain the graph
  */
 function createDeathsGraph(containerId) {
@@ -227,6 +236,11 @@ function createDeathsGraph(containerId) {
   })
 }
 
+/**
+ * Create a bar plot with the number of new Covid-19 hospitalizations per day
+ * Data by Sciensano
+ * @param {string} containerId Id of the div container which will contain this graph
+ */
 function createHospitalGraph(containerId) {    
   covid = {}
   barSpacing = 0.5
@@ -287,8 +301,9 @@ function createHospitalGraph(containerId) {
 }
 
 /**
- * Create graph with Covid-19 deaths and append the sentiment deviation line to it
- * @param {string} containerId Id of the div which will contain the graph
+ * Create a bar plot with Covid-19 deaths together with a line-plot of the 7- and 14-day sliding window
+ * of the average negative sentiment fraction
+ * @param {string} containerId Id of the div container which will contain the graph
  */
 function createDeathSentGraph(containerId) {
   covid_deaths   = {}
@@ -417,7 +432,11 @@ function createDeathSentGraph(containerId) {
   })
 }
 
-
+/**
+ * Create a bar plot with Covid-19 deaths together with a line-plot of the signed squared deviation
+ * of the sentiment
+ * @param {string} containerId Id of the div container which will contain this graph
+ */
 function createDeathSentGraph2(containerId) {
   covid_deaths   = {}
   var newWidth = graphWidth - 6
@@ -539,6 +558,10 @@ function createLocationMap(mapName) {
     }, 400);
 }
 
+/**
+ * Displays the 5 most popular tweets
+ * @param {string} divId Id of the div container which will contain this tweets
+ */
 function showMostPopular(divId) {
   var container = d3.select(divId)
   d3.csv('../data/most_popular_tweets.csv', function (tweet) {

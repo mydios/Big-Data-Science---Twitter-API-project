@@ -266,7 +266,7 @@ function createHospitalGraph(containerId) {
     domain[1] = domain[1].setDate(domain[1].getDate() + 1)
     var xScale = d3.scaleTime().domain(domain).range([paddingLeft + (graphWidth/numDays - barSpacing)/2, graphWidth+paddingLeft - (graphWidth/numDays - barSpacing)/2]);
     
-    var xAxis = d3.axisBottom().scale(xScale).ticks(5).tickSizeOuter(0);
+    var xAxis = d3.axisBottom().scale(xScale).ticks(15).tickSizeOuter(0);
     var yAxis = d3.axisLeft().scale(yScale).ticks(10);
     
     svg.append('g').attr('class','axis').attr("transform", "translate(-"+barSpacing/2+","+graphHeight+")").call(xAxis).selectAll('text').attr('y',-2).attr('x', 15).attr("transform", "rotate(90)")

@@ -178,7 +178,7 @@ function createInfectionsGraph(containerId) {
  * @param {string} containerId Id of the div container which will contain the graph
  */
 function createDeathsGraph(containerId) {
-  covid_deaths   = {}
+  var covid_deaths   = {}
   var newWidth = graphWidth - 6
   var svg = d3.select(containerId).append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
   d3.csv('data/COVID19BE_MORT.csv', function(d) {
@@ -186,6 +186,7 @@ function createDeathsGraph(containerId) {
       covid_deaths[d['DATE']] = { date: d['DATE'], count: covid_deaths[d['DATE']]['count'] + parseInt(d['DEATHS'], 0) }
     else
       covid_deaths[d['DATE']] = { date: d['DATE'], count: parseInt(d['DEATHS'], 0) }
+      console.log(covid_deaths[d['DATE']])
   }).then(_ => {
     delete covid_deaths['NA']
     covid_deaths_filtered = Object.values(covid_deaths)
@@ -306,7 +307,7 @@ function createHospitalGraph(containerId) {
  * @param {string} containerId Id of the div container which will contain the graph
  */
 function createDeathSentGraph(containerId) {
-  covid_deaths   = {}
+  var covid_deaths  = {}
   var newWidth = graphWidth - 6
   var svg = d3.select(containerId).append('svg').attr("preserveAspectRatio", "xMinYMin meet").attr("viewBox", "0 0 200 200").classed("svg-content", true);
   d3.csv('data/COVID19BE_MORT.csv', function(d) {
@@ -316,7 +317,7 @@ function createDeathSentGraph(containerId) {
       covid_deaths[d['DATE']] = { date: d['DATE'], count: parseInt(d['DEATHS'], 0) }
   }).then(_ => {
     delete covid_deaths['NA']
-    covid_deaths_filtered = Object.values(covid_deaths)
+    var covid_deaths_filtered = Object.values(covid_deaths)
 
     var barSpacing = 0.5
     var bars = svg.selectAll('rect').data(covid_deaths_filtered).enter();
@@ -475,7 +476,7 @@ function createDeathSentGraph2(containerId) {
       var currentBar = d3.select(this);
       currentBar.style('fill','rgb(53, 150, 78)')
       var date = new Date(d['date']).toDateString().split(' ')
-      var text = d3.select("#covid-deaths-text-2")
+      var text = d3.select("#covid-deaths-text-3")
       text.text(date[0]+' '+date[2]+' '+date[1]+": "+d['count']+ " new deaths").style("visibility", "visible")
     });
     rects.on("mouseout", function(_){

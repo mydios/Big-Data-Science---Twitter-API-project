@@ -41,4 +41,5 @@ def preprocess_tweet(tweet:str):
     return tweet
 
 if (__name__ == '__main__'):
-    print(preprocess_tweet("@ALL https://stackoverflow.com/questions/43797500/python-replace-unicode-emojis-with-ascii-characters/43813727#43813727 is a super useful link!! 🤩🤩"))
+    example = "@ALL https://stackoverflow.com/questions/43797500/python-replace-unicode-emojis-with-ascii-characters/43813727#43813727 is a super useful link!! 🤩🤩"
+    print("Example: original=%s, preprocessed=%s"%(example, preprocess_tweet(example)))

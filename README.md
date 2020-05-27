@@ -2,8 +2,7 @@
  Twitter API project Big Data Science course University of Ghent, 2020
 
 ## Research question
- Is it possible determine the peak of the COVID-19 epidemic in Belgium by analysing the sentiment of tweets gathered throughout the pandemic?
-
+ Did the peak of the COVID-19 epidemic in Belgium have an observable influence on the tweeting behaviour in Flanders?
 ## Folder structure
  /data 			-> all raw data gathered from twitter and all further processed data (e.g. from the notebooks in '/data exploration' used for visualisation in the dashboard)
  /data exploration 	-> 2 logically consecutive notebooks in which the raw sentiment data from '/data' is explored and various visualisations are made based on intuition to find an answer for our research question

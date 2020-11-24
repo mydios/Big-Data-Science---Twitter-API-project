@@ -11,5 +11,4 @@
  * **/sentiment_analysis**  multiple .py files containing all code used to do the sentiment analysis. 
  * **/requirements.txt** 	  all dependencies necessary for execution of the python code used in this project
 
-Jan Mariën, EMCOMSC 
-Dylan Van Parys, EMCOMSC
+Jan Mariën, EMCOMSC & Dylan Van Parys, EMCOMSC
